@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session as SQLAlchemySession
 from sqlalchemy.orm import scoped_session, sessionmaker
-
+from google.cloud import spanner
 from .models import Base
 
 
@@ -21,7 +21,7 @@ class DatabaseManager:
         """Initializes the database engine and session factory."""
         if not self.database_uri:
             raise RuntimeError("Database URI is not set. Set the EMBEDCHAIN_DB_URI environment variable.")
-        connect_args = {}
+        connect_args = {"client": spanner.Client(project="classyclass-dev")}
         if self.database_uri.startswith("sqlite"):
             connect_args["check_same_thread"] = False
         self.engine = create_engine(self.database_uri, echo=self.echo, connect_args=connect_args)
