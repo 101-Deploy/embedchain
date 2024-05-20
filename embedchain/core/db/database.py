@@ -154,7 +154,7 @@ class DatabaseManager:
         except Exception as e:
             raise e
 
-    def get_total_interactions(month: int, year: int):
+    def get_total_interactions(self, month: int, year: int):
         """Get the total number of interactions for a given month and year."""
 
         if not month or not year:
