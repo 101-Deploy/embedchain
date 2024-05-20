@@ -112,7 +112,7 @@ class DatabaseManager:
             with self.database.snapshot() as snapshot:
                 results = snapshot.execute_sql(sql)
                 if results:
-                    return results
+                    return results.to_dict_list()
         except Exception as e:
             raise e
 

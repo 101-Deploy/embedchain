@@ -99,17 +99,17 @@ class ChatHistory:
             if display_format:
                 history.append(
                     {
-                        "session_id": result.session_id,
-                        "human": result.question,
-                        "ai": result.answer,
-                        "metadata": result.meta_data,
-                        "timestamp": result.created_at,
+                        "session_id": result["session_id"],
+                        "human": result["question"],
+                        "ai": result["answer"],
+                        "metadata": result["meta_data"],
+                        "timestamp": result["created_at"],
                     }
                 )
             else:
                 memory = ChatMessage()
-                memory.add_user_message(result.question, metadata=result.metadata)
-                memory.add_ai_message(result.answer, metadata=result.metadata)
+                memory.add_user_message(result["question"], metadata=result["metadata"])
+                memory.add_ai_message(result["answer"], metadata=result["metadata"])
                 history.append(memory)
         return history
 
