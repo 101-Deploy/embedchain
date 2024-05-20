@@ -9,19 +9,23 @@ import requests
 import yaml
 from tqdm import tqdm
 
-from embedchain.cache import (Config, ExactMatchEvaluation,
-                              SearchDistanceEvaluation, cache,
-                              gptcache_data_manager, gptcache_pre_function)
+from embedchain.cache import (
+    Config,
+    ExactMatchEvaluation,
+    SearchDistanceEvaluation,
+    cache,
+    gptcache_data_manager,
+    gptcache_pre_function,
+)
 from embedchain.client import Client
 from embedchain.config import AppConfig, CacheConfig, ChunkerConfig
-from embedchain.core.db.database import get_session, init_db, setup_engine
+from embedchain.core.db.database import get_session, init_db, setup_engine, execute_sql
 from embedchain.core.db.models import DataSource
 from embedchain.embedchain import EmbedChain
 from embedchain.embedder.base import BaseEmbedder
 from embedchain.embedder.openai import OpenAIEmbedder
 from embedchain.evaluation.base import BaseMetric
-from embedchain.evaluation.metrics import (AnswerRelevance, ContextRelevance,
-                                           Groundedness)
+from embedchain.evaluation.metrics import AnswerRelevance, ContextRelevance, Groundedness
 from embedchain.factory import EmbedderFactory, LlmFactory, VectorDBFactory
 from embedchain.helpers.json_serializable import register_deserializable
 from embedchain.llm.base import BaseLlm
@@ -285,10 +289,24 @@ class App(EmbedChain):
             return False
 
     def _mark_data_as_uploaded(self, data_hash):
-        self.db_session.query(DataSource).filter_by(hash=data_hash, app_id=self.local_id).update({"is_uploaded": 1})
+        # sql to update the is_uploaded flag in ec_data_sources
+        # self.db_session.query(DataSource).filter_by(hash=data_hash, app_id=self.local_id).update({"is_uploaded": 1})
+        sql = f"""
+            UPDATE ec_data_sources
+            SET is_uploaded = 1
+            WHERE hash = '{data_hash}' AND app_id = '{self.local_id}';
+        """
+        execute_sql(sql)
 
     def get_data_sources(self):
-        data_sources = self.db_session.query(DataSource).filter_by(app_id=self.local_id).all()
+        # sql to get the data sources from ec_data_sources
+        # data_sources = self.db_session.query(DataSource).filter_by(app_id=self.local_id).all()
+        sql = f"""
+            SELECT hash, type, value, metadata
+            FROM ec_data_sources
+            WHERE app_id = '{self.local_id}';
+        """
+        data_sources = execute_sql(sql)
         results = []
         for row in data_sources:
             results.append({"data_type": row.type, "data_value": row.value, "metadata": row.meta_data})
@@ -301,7 +319,14 @@ class App(EmbedChain):
         pipeline_data = self._create_pipeline()
         self.id = pipeline_data["id"]
 
-        results = self.db_session.query(DataSource).filter_by(app_id=self.local_id, is_uploaded=0).all()
+        # sql to get the data sources from ec_data_sources
+        sql = f"""
+            SELECT hash, type, value
+            FROM ec_data_sources
+            WHERE app_id = '{self.local_id}' AND is_uploaded = 0;
+        """
+        # results = self.db_session.query(DataSource).filter_by(app_id=self.local_id, is_uploaded=0).all()
+        results = execute_sql(sql)
         if len(results) > 0:
             print("🛠️ Adding data to your pipeline...")
         for result in results:

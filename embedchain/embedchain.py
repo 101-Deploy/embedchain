@@ -6,9 +6,7 @@ from typing import Any, Optional, Union
 from dotenv import load_dotenv
 from langchain.docstore.document import Document
 
-from embedchain.cache import (adapt, get_gptcache_session,
-                              gptcache_data_convert,
-                              gptcache_update_cache_callback)
+from embedchain.cache import adapt, get_gptcache_session, gptcache_data_convert, gptcache_update_cache_callback
 from embedchain.chunkers.base_chunker import BaseChunker
 from embedchain.config import AddConfig, BaseLlmConfig, ChunkerConfig
 from embedchain.config.base_app_config import BaseAppConfig
@@ -18,10 +16,10 @@ from embedchain.embedder.base import BaseEmbedder
 from embedchain.helpers.json_serializable import JSONSerializable
 from embedchain.llm.base import BaseLlm
 from embedchain.loaders.base_loader import BaseLoader
-from embedchain.models.data_type import (DataType, DirectDataType,
-                                         IndirectDataType, SpecialDataType)
+from embedchain.models.data_type import DataType, DirectDataType, IndirectDataType, SpecialDataType
 from embedchain.utils.misc import detect_datatype, is_valid_json_string
 from embedchain.vectordb.base import BaseVectorDB
+from embedchain.core.db.database import execute_sql
 
 load_dotenv()
 
@@ -160,7 +158,8 @@ class EmbedChain(JSONSerializable):
                 data_type = DataType(data_type)
             except ValueError:
                 logger.info(
-                    f"Invalid data_type: '{data_type}', using `custom` instead.\n Check docs to pass the valid data type: `https://docs.embedchain.ai/data-sources/overview`"  # noqa: E501
+                    init_db,
+                    f"Invalid data_type: '{data_type}', using `custom` instead.\n Check docs to pass the valid data type: `https://docs.embedchain.ai/data-sources/overview`",  # noqa: E501
                 )
                 data_type = DataType.CUSTOM
 
@@ -184,20 +183,27 @@ class EmbedChain(JSONSerializable):
             source = str(source)
 
         # Insert the data into the 'ec_data_sources' table
-        self.db_session.add(
-            DataSource(
-                hash=source_hash,
-                app_id=self.config.id,
-                type=data_type.value,
-                value=source,
-                metadata=json.dumps(metadata),
-            )
-        )
+        # self.db_session.add(
+        #     DataSource(
+        #         hash=source_hash,
+        #         app_id=self.config.id,
+        #         type=data_type.value,
+        #         value=source,
+        #         metadata=json.dumps(metadata),
+        #     )
+        # )
+        # sql to insert data into the ec_data_sources table
+        sql = f"""
+        INSERT INTO ec_data_sources (id, app_id, hash, type, value, metadata)
+        VALUES ('{source_hash}', '{self.config.id}', '{data_type.value}', '{source}', '{json.dumps(metadata)}');
+        """
         try:
-            self.db_session.commit()
+            # self.db_session.commit()
+            execute_sql(sql)
+
         except Exception as e:
             logger.error(f"Error adding data source: {e}")
-            self.db_session.rollback()
+            # self.db_session.rollback()
 
         if dry_run:
             data_chunks_info = {"chunks": documents, "metadata": metadatas, "count": len(documents), "type": data_type}
@@ -655,12 +661,18 @@ class EmbedChain(JSONSerializable):
         `App` does not have to be reinitialized after using this method.
         """
         try:
-            self.db_session.query(DataSource).filter_by(app_id=self.config.id).delete()
-            self.db_session.query(ChatHistory).filter_by(app_id=self.config.id).delete()
-            self.db_session.commit()
+            # self.db_session.query(DataSource).filter_by(app_id=self.config.id).delete()
+            # sql to delete data sources
+            sql = f"DELETE FROM ec_data_sources WHERE app_id = '{self.config.id}'"
+            # sql to delete chat history
+            sql_chat = f"DELETE FROM ec_chat_history WHERE app_id = '{self.config.id}'"
+            # self.db_session.query(ChatHistory).filter_by(app_id=self.config.id).delete()
+            # self.db_session.commit()
+            execute_sql(sql)
+            execute_sql(sql_chat)
         except Exception as e:
             logger.error(f"Error deleting data sources: {e}")
-            self.db_session.rollback()
+            # self.db_session.rollback()
             return None
         self.db.reset()
         self.delete_all_chat_history(app_id=self.config.id)
@@ -698,11 +710,15 @@ class EmbedChain(JSONSerializable):
         :type source_hash: str
         """
         try:
-            self.db_session.query(DataSource).filter_by(hash=source_id, app_id=self.config.id).delete()
-            self.db_session.commit()
+            # sql to delete data sources
+            sql = f"DELETE FROM ec_data_sources WHERE hash = '{source_id}' AND app_id = '{self.config.id}'"
+
+            # self.db_session.query(DataSource).filter_by(hash=source_id, app_id=self.config.id).delete()
+            # self.db_session.commit()
+            execute_sql(sql)
         except Exception as e:
             logger.error(f"Error deleting data sources: {e}")
-            self.db_session.rollback()
+            # self.db_session.rollback()
             return None
         self.db.delete(where={"hash": source_id})
         logger.info(f"Successfully deleted {source_id}")

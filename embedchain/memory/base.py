@@ -3,7 +3,7 @@ import logging
 import uuid
 from typing import Any, Optional
 
-from embedchain.core.db.database import get_session
+from embedchain.core.db.database import get_session, execute_sql
 from embedchain.core.db.models import ChatHistory as ChatHistoryModel
 from embedchain.memory.message import ChatMessage
 from embedchain.memory.utils import merge_metadata_dict
@@ -13,28 +13,35 @@ logger = logging.getLogger(__name__)
 
 class ChatHistory:
     def __init__(self) -> None:
-        self.db_session = get_session()
+        # self.db_session = get_session()
+        return None
 
     def add(self, app_id, session_id, chat_message: ChatMessage) -> Optional[str]:
         memory_id = str(uuid.uuid4())
         metadata_dict = merge_metadata_dict(chat_message.human_message.metadata, chat_message.ai_message.metadata)
         if metadata_dict:
             metadata = self._serialize_json(metadata_dict)
-        self.db_session.add(
-            ChatHistoryModel(
-                app_id=app_id,
-                id=memory_id,
-                session_id=session_id,
-                question=chat_message.human_message.content,
-                answer=chat_message.ai_message.content,
-                metadata=metadata if metadata_dict else "{}",
-            )
-        )
+        # self.db_session.add(
+        #     ChatHistoryModel(
+        #         app_id=app_id,
+        #         id=memory_id,
+        #         session_id=session_id,
+        #         question=chat_message.human_message.content,
+        #         answer=chat_message.ai_message.content,
+        #         metadata=metadata if metadata_dict else "{}",
+        #     )
+        # )
         try:
-            self.db_session.commit()
+            # self.db_session.commit()
+            sql = f"""
+            INSERT INTO ec_chat_history (app_id, id, session_id, question, answer, metadata) 
+            VALUES ('{app_id}', '{memory_id}', '{session_id}', '{chat_message.human_message.content}',
+            '{chat_message.ai_message.content}', '{metadata}');
+            """
+            execute_sql(sql)
         except Exception as e:
             logger.error(f"Error adding chat memory to db: {e}")
-            self.db_session.rollback()
+            # self.db_session.rollback()
             return None
 
         logger.info(f"Added chat memory to db with id: {memory_id}")
@@ -53,12 +60,15 @@ class ChatHistory:
         params = {"app_id": app_id}
         if session_id:
             params["session_id"] = session_id
-        self.db_session.query(ChatHistoryModel).filter_by(**params).delete()
+        # self.db_session.query(ChatHistoryModel).filter_by(**params).delete()
+        # sql to delete chat history
+        sql = f"DELETE FROM ec_chat_history WHERE app_id = '{app_id}'"
         try:
-            self.db_session.commit()
+            # self.db_session.commit()
+            execute_sql(sql)
         except Exception as e:
             logger.error(f"Error deleting chat history: {e}")
-            self.db_session.rollback()
+            # self.db_session.rollback()
 
     def get(
         self, app_id, session_id: str = "default", num_rounds=10, fetch_all: bool = False, display_format=False
@@ -75,13 +85,16 @@ class ChatHistory:
         params = {"app_id": app_id}
         if not fetch_all:
             params["session_id"] = session_id
-        results = (
-            self.db_session.query(ChatHistoryModel).filter_by(**params).order_by(ChatHistoryModel.created_at.asc())
-        )
-        results = results.limit(num_rounds) if not fetch_all else results
+
+        # sql to get chat history
+        sql = f"""
+        SELECT * FROM ec_chat_history WHERE app_id = '{app_id}' ORDER BY created_at ASC;
+        """
+        results = execute_sql(sql)
+        results = results[:num_rounds] if not fetch_all else results
         history = []
         for result in results:
-            metadata = self._deserialize_json(metadata=result.meta_data or "{}")
+            # metadata = self._deserialize_json(result.meta_data)
             # Return list of dict if display_format is True
             if display_format:
                 history.append(
@@ -95,8 +108,8 @@ class ChatHistory:
                 )
             else:
                 memory = ChatMessage()
-                memory.add_user_message(result.question, metadata=metadata)
-                memory.add_ai_message(result.answer, metadata=metadata)
+                memory.add_user_message(result.question, metadata=result.metadata)
+                memory.add_ai_message(result.answer, metadata=result.metadata)
                 history.append(memory)
         return history
 
