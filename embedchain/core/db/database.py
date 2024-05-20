@@ -122,14 +122,14 @@ class DatabaseManager:
             with self.database.batch() as batch:
                 batch.insert(
                     table=table,
-                    columns=("id", "app_id", "hash", "type", "value", "metadata"),
+                    columns=("id", "app_id", "session_id", "question", "answer", "metadata"),
                     values=[
                         (
                             values["id"],
                             values["app_id"],
-                            values["hash"],
-                            values["type"],
-                            values["value"],
+                            values["session_id"],
+                            values["question"],
+                            values["answer"],
                             values["metadata"],
                         )
                     ],
