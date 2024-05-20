@@ -3,7 +3,7 @@ import logging
 import uuid
 from typing import Any, Optional
 
-from embedchain.core.db.database import get_session, execute_sql
+from embedchain.core.db.database import get_session, execute_sql, excute_insert
 from embedchain.core.db.models import ChatHistory as ChatHistoryModel
 from embedchain.memory.message import ChatMessage
 from embedchain.memory.utils import merge_metadata_dict
@@ -33,12 +33,15 @@ class ChatHistory:
         # )
         try:
             # self.db_session.commit()
-            sql = f"""
-            INSERT INTO ec_chat_history (app_id, id, session_id, question, answer, metadata) 
-            VALUES ('{app_id}', '{memory_id}', '{session_id}', '{chat_message.human_message.content}',
-            '{chat_message.ai_message.content}', '{metadata}');
-            """
-            execute_sql(sql)
+            values = {
+                "app_id": app_id,
+                "id": memory_id,
+                "session_id": session_id,
+                "question": chat_message.human_message.content,
+                "answer": chat_message.ai_message.content,
+                "metadata": metadata if metadata_dict else "{}",
+            }
+            excute_insert(values=values, table="ec_chat_history")
         except Exception as e:
             logger.error(f"Error adding chat memory to db: {e}")
             # self.db_session.rollback()

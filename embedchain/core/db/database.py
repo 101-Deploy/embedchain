@@ -116,6 +116,28 @@ class DatabaseManager:
         except Exception as e:
             raise e
 
+    def execute_insert(self, table: str, values: dict):
+        """Executes a raw SQL statement."""
+        try:
+            with self.database.batch() as batch:
+                batch.insert(
+                    table=table,
+                    columns=("id", "app_id", "hash", "type", "value", "metadata"),
+                    values=[
+                        (
+                            values["id"],
+                            values["app_id"],
+                            values["hash"],
+                            values["type"],
+                            values["value"],
+                            values["metadata"],
+                        )
+                    ],
+                )
+            return values["id"]
+        except Exception as e:
+            raise e
+
 
 # Singleton pattern to use throughout the application
 database_manager = DatabaseManager()
@@ -150,6 +172,10 @@ def get_session():
 
 def execute_sql(sql: str):
     return database_manager.execute_sql(sql)
+
+
+def excute_insert(values: dict, table: str):
+    return database_manager.execute_insert(table=table, values=values)
 
 
 def execute_transaction(transaction_block):
