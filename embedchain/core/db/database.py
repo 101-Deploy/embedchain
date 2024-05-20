@@ -125,6 +125,8 @@ database_manager = DatabaseManager()
 def setup_engine(database_uri: str, echo: bool = False) -> None:
     # database_manager.database_uri = database_uri
     # database_manager.echo = echo
+    database_manager.instance_id = os.environ.get("EMBEDCHAIN_INSTANCE_ID")
+    database_manager.database_id = os.environ.get("EMBEDCHAIN_DATABASE_ID")
     database_manager.setup_engine()
 
 
