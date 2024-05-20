@@ -148,8 +148,8 @@ def get_session():
     return None
 
 
-def execute_sql(sql: str) -> None:
-    database_manager.execute_sql(sql)
+def execute_sql(sql: str):
+    return database_manager.execute_sql(sql)
 
 
 def execute_transaction(transaction_block):
