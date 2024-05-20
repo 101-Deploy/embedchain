@@ -9,6 +9,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from google.cloud import spanner
 from google.cloud.spanner_dbapi import connect
 from .models import Base
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class DatabaseManager:
