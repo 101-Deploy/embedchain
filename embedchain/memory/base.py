@@ -42,6 +42,7 @@ class ChatHistory:
                 "metadata": metadata if metadata_dict else "{}",
             }
             excute_insert(values=values, table="ec_chat_history")
+            logger.info(f"Added chat memory to db with id: {values}")
         except Exception as e:
             logger.error(f"Error adding chat memory to db: {e}")
             # self.db_session.rollback()
