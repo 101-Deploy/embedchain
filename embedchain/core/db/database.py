@@ -78,7 +78,7 @@ class DatabaseManager:
         # create the tables in the database if they do not exist
         operation = self.database.update_ddl(ddl_statements)
 
-    def get_session(self) -> spanner.Database:
+    def get_session(self):
         # """Provides a session for database operations."""
         # if not self._session_factory:
         #     raise RuntimeError("Session factory is not initialized. Call setup_engine() first.")
