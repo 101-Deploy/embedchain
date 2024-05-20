@@ -19,7 +19,7 @@ from embedchain.loaders.base_loader import BaseLoader
 from embedchain.models.data_type import DataType, DirectDataType, IndirectDataType, SpecialDataType
 from embedchain.utils.misc import detect_datatype, is_valid_json_string
 from embedchain.vectordb.base import BaseVectorDB
-from embedchain.core.db.database import execute_sql
+from embedchain.core.db.database import execute_sql, get_total_interactions
 
 load_dotenv()
 
@@ -725,3 +725,8 @@ class EmbedChain(JSONSerializable):
         # Send anonymous telemetry
         if self.config.collect_metrics:
             self.telemetry.capture(event_name="delete", properties=self._telemetry_props)
+
+    def get_total_interactions(month: int, year: int):
+        if not month or not year:
+            raise RuntimeError("Month and year is required while fetching total interactions.")
+        return get_total_interactions(month=month, year=year)

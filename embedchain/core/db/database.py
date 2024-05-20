@@ -71,6 +71,9 @@ class DatabaseManager:
                 answer TEXT,
                 metadata TEXT,
                 created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                was_helpful BOOLEAN,
+                rating INT,
+                feedback TEXT,
                 PRIMARY KEY (app_id, id, session_id)
             );
 
@@ -122,7 +125,17 @@ class DatabaseManager:
             with self.database.batch() as batch:
                 batch.insert(
                     table=table,
-                    columns=("id", "app_id", "session_id", "question", "answer", "metadata"),
+                    columns=(
+                        "id",
+                        "app_id",
+                        "session_id",
+                        "question",
+                        "answer",
+                        "metadata",
+                        # "was_helpful",
+                        # "rating",
+                        # "feedback",
+                    ),
                     values=[
                         (
                             values["id"],
@@ -131,10 +144,38 @@ class DatabaseManager:
                             values["question"],
                             values["answer"],
                             values["metadata"],
+                            # values["was_helpful"],
+                            # values["rating"],
+                            # values["feedback"],
                         )
                     ],
                 )
             return values["id"]
+        except Exception as e:
+            raise e
+
+    def get_total_interactions(month: int, year: int):
+        """Get the total number of interactions for a given month and year."""
+
+        if not month or not year:
+            raise RuntimeError("Month and year is required while fetching total interactions.")
+
+        sql = f"""SELECT
+        EXTRACT(MONTH FROM created_at) AS month,
+        EXTRACT(YEAR FROM created_at) AS year,
+        COUNT(*) AS interactions,
+        COUNT(DISTINCT session_id) AS unique_users,
+        COUNT(rating) AS total_ratings,
+        AVG(rating) AS average_rating
+        FROM ec_chat_history
+        WHERE EXTRACT(YEAR FROM created_at) = {year} AND
+        EXTRACT(MONTH FROM created_at) = {month}
+        GROUP BY year, month
+        ORDER BY year, month;
+        """
+        try:
+            results = execute_sql(sql)
+            return results
         except Exception as e:
             raise e
 
@@ -172,6 +213,10 @@ def get_session():
 
 def execute_sql(sql: str):
     return database_manager.execute_sql(sql)
+
+
+def get_total_interactions(month: int, year: int):
+    return database_manager.get_total_interactions(month, year)
 
 
 def excute_insert(values: dict, table: str):
