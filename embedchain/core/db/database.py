@@ -138,7 +138,7 @@ def alembic_upgrade() -> None:
 
 
 def init_db() -> None:
-    alembic_upgrade()
+    # alembic_upgrade()
 
     # def get_session() -> SQLAlchemySession:
     return database_manager.get_session()
