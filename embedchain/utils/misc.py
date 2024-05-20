@@ -431,6 +431,7 @@ def validate_config(config_data):
                     Optional("model_kwargs"): dict,
                     Optional("local"): bool,
                     Optional("base_url"): str,
+                    Optional("default_headers"): dict,
                 },
             },
             Optional("vectordb"): {
@@ -449,6 +450,7 @@ def validate_config(config_data):
                     "google",
                     "mistralai",
                     "nvidia",
+                    "ollama",
                 ),
                 Optional("config"): {
                     Optional("model"): Optional(str),
@@ -458,6 +460,7 @@ def validate_config(config_data):
                     Optional("title"): str,
                     Optional("task_type"): str,
                     Optional("vector_dimension"): int,
+                    Optional("base_url"): str,
                 },
             },
             Optional("embedding_model"): {
@@ -470,6 +473,7 @@ def validate_config(config_data):
                     "google",
                     "mistralai",
                     "nvidia",
+                    "ollama",
                 ),
                 Optional("config"): {
                     Optional("model"): str,
@@ -478,6 +482,7 @@ def validate_config(config_data):
                     Optional("title"): str,
                     Optional("task_type"): str,
                     Optional("vector_dimension"): int,
+                    Optional("base_url"): str,
                 },
             },
             Optional("chunker"): {
