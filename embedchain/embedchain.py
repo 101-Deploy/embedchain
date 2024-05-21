@@ -730,3 +730,14 @@ class EmbedChain(JSONSerializable):
         if not month or not year:
             raise RuntimeError("Month and year is required while fetching total interactions.")
         return get_total_interactions(month=month, year=year)
+
+    def get_questions(self, app_id: str, limit: int = 10, offset: int = 0):
+        if not app_id:
+            raise RuntimeError("App id is required while fetching chat history.")
+
+        sql = f"SELECT question, answer FROM ec_chat_history WHERE app_id = '{app_id}' ORDER BY created_at DESC LIMIT {limit} OFFSET {offset};"
+        try:
+            results = execute_sql(sql)
+            return results
+        except Exception as e:
+            raise e
