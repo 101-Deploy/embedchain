@@ -742,7 +742,7 @@ class EmbedChain(JSONSerializable):
         except Exception as e:
             raise e
 
-    def update_was_usefull(record_id: int, was_helpful):
+    def update_was_usefull(self, record_id: int, was_helpful):
         if not record_id:
             raise RuntimeError("Record id is required while updating chat history.")
 
@@ -761,7 +761,7 @@ class EmbedChain(JSONSerializable):
         except Exception as e:
             raise e
 
-    def update_rating(record_id: int, rating):
+    def update_rating(self, record_id: int, rating):
         if not record_id:
             raise RuntimeError("Record id is required while updating chat history.")
 
@@ -780,7 +780,7 @@ class EmbedChain(JSONSerializable):
         except Exception as e:
             raise e
 
-    def update_feedback(record_id: int, feedback):
+    def update_feedback(self, record_id: int, feedback):
         if not record_id:
             raise RuntimeError("Record id is required while updating chat history.")
 
