@@ -741,3 +741,87 @@ class EmbedChain(JSONSerializable):
             return results
         except Exception as e:
             raise e
+
+    def update_was_usefull(record_id: int, was_helpful):
+        if not record_id:
+            raise RuntimeError("Record id is required while updating chat history.")
+
+        if type(was_helpful) != bool:
+            raise RuntimeError("was_usefull should be boolean.")
+
+        sql = f"""
+        UPDATE ec_chat_history
+        SET was_helpful = {was_helpful}
+        WHERE id = '{record_id}';
+        """
+
+        try:
+            results = execute_sql(sql)
+            return results
+        except Exception as e:
+            raise e
+
+    def update_rating(record_id: int, rating):
+        if not record_id:
+            raise RuntimeError("Record id is required while updating chat history.")
+
+        if type(rating) != int:
+            raise RuntimeError("Rating should be integer.")
+
+        sql = f"""
+        UPDATE ec_chat_history
+        SET rating = {rating}
+        WHERE id = '{record_id}';
+        """
+
+        try:
+            results = execute_sql(sql)
+            return results
+        except Exception as e:
+            raise e
+
+    def update_feedback(record_id: int, feedback):
+        if not record_id:
+            raise RuntimeError("Record id is required while updating chat history.")
+
+        if type(feedback) != str:
+            raise RuntimeError("Feedback should be string.")
+
+        sql = f"""
+        UPDATE ec_chat_history
+        SET feedback = '{feedback}'
+        WHERE id = '{record_id}';
+        """
+
+        try:
+            results = execute_sql(sql)
+            return results
+        except Exception as e:
+            raise e
+
+    def update_response_helpfulness(record_id: int, was_helpful: bool, rating: int, feedback: str):
+        if not record_id:
+            raise RuntimeError("Record id is required while updating chat history.")
+
+        if type(was_helpful) != bool:
+            raise RuntimeError("was_usefull should be boolean.")
+
+        if type(rating) != int:
+            raise RuntimeError("Rating should be integer.")
+
+        if type(feedback) != str:
+            raise RuntimeError("Feedback should be string.")
+
+        sql = f"""
+        UPDATE ec_chat_history
+        SET was_helpful = {was_helpful},
+        rating = {rating},
+        feedback = '{feedback}'
+        WHERE id = '{record_id}';
+        """
+
+        try:
+            results = execute_sql(sql)
+            return results
+        except Exception as e:
+            raise e
