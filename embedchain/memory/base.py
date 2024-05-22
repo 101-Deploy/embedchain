@@ -98,7 +98,7 @@ class ChatHistory:
         results = results[:num_rounds] if not fetch_all else results
         history = []
         for result in results:
-            # metadata = self._deserialize_json(result.meta_data)
+            # metadata = self._deserialize_json(result.metadata)
             # Return list of dict if display_format is True
             if display_format:
                 history.append(
@@ -106,7 +106,7 @@ class ChatHistory:
                         "session_id": result["session_id"],
                         "human": result["question"],
                         "ai": result["answer"],
-                        "metadata": result["meta_data"] if result["meta_data"] else "{}",
+                        "metadata": result["metadata"] if result["metadata"] else "{}",
                         "timestamp": result["created_at"],
                     }
                 )
