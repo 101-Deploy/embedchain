@@ -106,7 +106,7 @@ class ChatHistory:
                         "session_id": result["session_id"],
                         "human": result["question"],
                         "ai": result["answer"],
-                        "metadata": result["meta_data"],
+                        "metadata": result["meta_data"] if result["meta_data"] else "{}",
                         "timestamp": result["created_at"],
                     }
                 )
