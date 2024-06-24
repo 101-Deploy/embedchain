@@ -19,7 +19,7 @@ from embedchain.loaders.base_loader import BaseLoader
 from embedchain.models.data_type import DataType, DirectDataType, IndirectDataType, SpecialDataType
 from embedchain.utils.misc import detect_datatype, is_valid_json_string
 from embedchain.vectordb.base import BaseVectorDB
-from embedchain.core.db.database import execute_sql, get_total_interactions
+from embedchain.core.db.database import execute_insert, execute_sql, get_total_interactions
 
 load_dotenv()
 
@@ -193,13 +193,20 @@ class EmbedChain(JSONSerializable):
         #     )
         # )
         # sql to insert data into the ec_data_sources table
-        sql = f"""
-        INSERT INTO ec_data_sources (id, app_id, hash, type, value, metadata)
-        VALUES ('{source_hash}', '{self.config.id}', '{data_type.value}', '{source}', '{json.dumps(metadata)}');
-        """
+        # sql = f"""
+        # INSERT INTO ec_data_sources (id, app_id, hash, type, value, metadata)
+        # VALUES ('{source_hash}', '{self.config.id}', '{data_type.value}', '{source}', '{json.dumps(metadata)}');
+        # """
         try:
             # self.db_session.commit()
-            execute_sql(sql)
+            # execute_sql(sql)
+            execute_insert({
+                'source_hash': source_hash,
+                'app_id': self.config.id,
+                'hash': data_type.value,
+                'type': source,
+                'value': json.dumps(metadata)
+            }, 'ec_data_sources')
 
         except Exception as e:
             logger.error(f"Error adding data source: {e}")

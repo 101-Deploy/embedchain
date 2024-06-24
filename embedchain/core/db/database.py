@@ -178,7 +178,18 @@ class DatabaseManager:
             return results
         except Exception as e:
             raise e
-
+    
+    def execute_sql_in_transaction(self, sql):
+        """Executes a raw SQL statement within a transaction."""
+        try:
+            with self.database.batch() as batch:
+                batch.update(
+                    sql
+                )
+        except Exception as e:
+            raise e
+    
+    
 
 # Singleton pattern to use throughout the application
 database_manager = DatabaseManager()
@@ -225,3 +236,16 @@ def excute_insert(values: dict, table: str):
 
 def execute_transaction(transaction_block):
     database_manager.execute_transaction(transaction_block)
+
+def get_db():
+    return database_manager.database
+
+def execute_insert(values: dict, table: str):
+        def insert_data(transaction):
+            sql = f"""
+            INSERT INTO {table} (id, app_id, hash, type, value, metadata)
+            VALUES ('{values['source_hash']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}', '{values['metadata']}');
+            """
+            transaction.execute_update(sql)
+
+        get_db().run_in_transaction(insert_data)
