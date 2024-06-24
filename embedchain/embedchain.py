@@ -206,7 +206,7 @@ class EmbedChain(JSONSerializable):
                 'hash': source_hash,
                 'type': data_type.value,
                 'value': source,
-                'metadata': json.dumps(metadata)
+                'metadata': json.dumps(metadata) if metadata else None
             }, 'ec_data_sources')
 
         except Exception as e:
