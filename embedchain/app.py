@@ -302,14 +302,14 @@ class App(EmbedChain):
         # sql to get the data sources from ec_data_sources
         # data_sources = self.db_session.query(DataSource).filter_by(app_id=self.local_id).all()
         sql = f"""
-            SELECT hash, type, value, metadata
+            SELECT *
             FROM ec_data_sources
             WHERE app_id = '{self.local_id}';
         """
         data_sources = execute_sql(sql)
         results = []
         for row in data_sources:
-            results.append({"data_type": row.type, "data_value": row.value, "metadata": row.meta_data})
+            results.append({"data_type": row.get('type'), "data_value": row.get('value'), "metadata": row.get('metadata'), "id": row.get('id')})
         return results
 
     def deploy(self):
