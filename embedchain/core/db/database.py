@@ -242,20 +242,22 @@ def get_db():
     return database_manager.database
 
 def execute_insert(values: dict, table: str):
-        def insert_data(transaction):
-            
-            # check if id is present in the values
-            if 'id' not in values:
-                values['id'] = str(uuid.uuid4())
-                
-            
-            # if metadata is not present in the values or is None, set it to Null
-            # # wrap in quotes for SQL string
-            
-            sql = f"""
-            INSERT INTO {table} (id, app_id, hash, type, value, metadata)
-            VALUES ('{values['id']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}', '{values['metadata']}');
-            """
-            transaction.execute_update(sql)
+    def insert_data(transaction):
+        # check if id is present in the values
+        if 'id' not in values:
+            values['id'] = str(uuid.uuid4())
 
-        get_db().run_in_transaction(insert_data)
+        # if metadata is not present in the values or is None, set it to 'NULL'
+        if 'metadata' not in values or values['metadata'] is None:
+            values['metadata'] = 'NULL'
+        else:
+            # wrap in quotes for SQL string
+            values['metadata'] = f"'{values['metadata']}'"
+
+        sql = f"""
+        INSERT INTO {table} (id, app_id, hash, type, value, metadata)
+        VALUES ('{values['id']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}', {values['metadata']});
+        """
+        transaction.execute_update(sql)
+
+    get_db().run_in_transaction(insert_data)
