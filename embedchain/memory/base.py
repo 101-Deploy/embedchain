@@ -75,7 +75,8 @@ class ChatHistory:
             # self.db_session.rollback()
 
     def get(
-        self, app_id, session_id: str = "default", num_rounds=10, fetch_all: bool = False, display_format=False
+        self, app_id, session_id: str = "default", num_rounds=10, fetch_all: bool = False, display_format=False, 
+        page_number: int = 1, page_size: int = 10
     ) -> list[ChatMessage]:
         """
         Get the chat history for a given app_id.
@@ -89,13 +90,18 @@ class ChatHistory:
         params = {"app_id": app_id}
         if not fetch_all:
             params["session_id"] = session_id
-
+        
+        page_number = 1  # replace with your actual page number
+        page_size = page_size  # replace with your actual page size
+        
+        offset = (page_number - 1) * page_size
+        
         # sql to get chat history
         sql = f"""
-        SELECT * FROM ec_chat_history WHERE app_id = '{app_id}' ORDER BY created_at ASC;
+        SELECT * FROM ec_chat_history WHERE app_id = '{app_id}' ORDER BY created_at ASC LIMIT {page_size} OFFSET {offset};
         """
         results = execute_sql(sql)
-        results = results[:num_rounds] if not fetch_all else results
+        # results = results[:num_rounds] if not fetch_all else results
         history = []
         for result in results:
             # metadata = self._deserialize_json(result.metadata)
