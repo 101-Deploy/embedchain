@@ -250,14 +250,11 @@ def execute_insert(values: dict, table: str):
                 
             
             # if metadata is not present in the values or is None, set it to Null
-            if 'metadata' not in values or values['metadata'] is None:
-                values['metadata'] = 'NULL'
-            else:
-                values['metadata'] = f"'{values['metadata']}'"  # wrap in quotes for SQL string
+            # # wrap in quotes for SQL string
             
             sql = f"""
             INSERT INTO {table} (id, app_id, hash, type, value, metadata)
-            VALUES ('{values['id']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}', {values['metadata']});
+            VALUES ('{values['id']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}',   '{values['metadata']}');
             """
             transaction.execute_update(sql)
 
