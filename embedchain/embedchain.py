@@ -200,7 +200,8 @@ class EmbedChain(JSONSerializable):
         try:
             # self.db_session.commit()
             # execute_sql(sql)
-            metadata_value = json.dumps(metadata) if metadata else 'NULL'
+            metadata_value = json.dumps(metadata) if metadata is not None else 'NULL'
+
             execute_insert({
                 # 'source_hash': source_hash,
                 'app_id': self.config.id,

@@ -56,7 +56,7 @@ class DatabaseManager:
                 hash TEXT,
                 type TEXT,
                 value TEXT,
-                metadata TEXT,
+                metadata ,
                 is_uploaded INT DEFAULT 0
             );
             
@@ -254,7 +254,7 @@ def execute_insert(values: dict, table: str):
             
             sql = f"""
             INSERT INTO {table} (id, app_id, hash, type, value, metadata)
-            VALUES ('{values['id']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}',   '{values['metadata']}');
+            VALUES ('{values['id']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}', '{values['metadata']}');
             """
             transaction.execute_update(sql)
 
