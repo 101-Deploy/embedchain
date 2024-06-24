@@ -695,6 +695,8 @@ class EmbedChain(JSONSerializable):
         display_format: bool = True,
         session_id: Optional[str] = "default",
         fetch_all: bool = False,
+        page_size: int = 10,
+        page_number: int = 1,
     ):
         history = self.llm.memory.get(
             app_id=self.config.id,
@@ -702,6 +704,8 @@ class EmbedChain(JSONSerializable):
             num_rounds=num_rounds,
             display_format=display_format,
             fetch_all=fetch_all,
+            page_size=page_size,
+            page_number=page_number
         )
         return history
 
