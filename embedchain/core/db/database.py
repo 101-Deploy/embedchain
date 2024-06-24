@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from alembic import command
 from alembic.config import Config
@@ -242,9 +243,14 @@ def get_db():
 
 def execute_insert(values: dict, table: str):
         def insert_data(transaction):
+            
+            # check if id is present in the values
+            if 'id' not in values:
+                values['id'] = str(uuid.uuid4())
+            
             sql = f"""
             INSERT INTO {table} (id, app_id, hash, type, value, metadata)
-            VALUES ('{values['source_hash']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}', '{values['metadata']}');
+            VALUES ('{values['id']}', '{values['app_id']}', '{values['hash']}', '{values['type']}', '{values['value']}', '{values['metadata']}');
             """
             transaction.execute_update(sql)
 

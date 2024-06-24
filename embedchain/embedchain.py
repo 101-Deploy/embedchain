@@ -158,7 +158,7 @@ class EmbedChain(JSONSerializable):
                 data_type = DataType(data_type)
             except ValueError:
                 logger.info(
-                    init_db,
+                    # init_db,
                     f"Invalid data_type: '{data_type}', using `custom` instead.\n Check docs to pass the valid data type: `https://docs.embedchain.ai/data-sources/overview`",  # noqa: E501
                 )
                 data_type = DataType.CUSTOM
@@ -201,11 +201,12 @@ class EmbedChain(JSONSerializable):
             # self.db_session.commit()
             # execute_sql(sql)
             execute_insert({
-                'source_hash': source_hash,
+                # 'source_hash': source_hash,
                 'app_id': self.config.id,
-                'hash': data_type.value,
-                'type': source,
-                'value': json.dumps(metadata)
+                'hash': source_hash,
+                'type': data_type.value,
+                'value': source,
+                'metadata': json.dumps(metadata)
             }, 'ec_data_sources')
 
         except Exception as e:
