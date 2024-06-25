@@ -29,7 +29,7 @@ class ChatHistory(Base):
     answer = Column(Text)
     meta_data = Column(Text, name="metadata")
     created_at = Column(TIMESTAMP, default=func.current_timestamp(), index=True)
-    was_helful = Column(Boolean)  # Added this column to the table
+    was_helpful = Column(Boolean)  # Added this column to the table
     rating = Column(Integer)  # Added this column to the table
     feedback = Column(Text)  # Added this column to the table
     # input_tokens_used = Column(Integer)  # Added this column to the table

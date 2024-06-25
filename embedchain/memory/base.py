@@ -111,6 +111,7 @@ class ChatHistory:
                         "ai": result["answer"],
                         "metadata": result["metadata"] if result["metadata"] else None,
                         "timestamp": result["created_at"],
+                        "id": result["id"],
                     }
                 )
             else:
