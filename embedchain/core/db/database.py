@@ -164,6 +164,7 @@ class DatabaseManager:
                 )
             return values["id"]
         except Exception as e:
+            print(e)
             raise e
     
     def execute_update_feedback(self, values: dict, table: str = "ec_chat_history"):
@@ -175,6 +176,7 @@ class DatabaseManager:
                 )
             return values["id"]
         except Exception as e:
+            print(e)
             raise e
     
     

@@ -818,6 +818,7 @@ class EmbedChain(JSONSerializable):
             )
             return results
         except Exception as e:
+            print(e)
             raise e
 
     def update_response_helpfulness(self, record_id: int, was_helpful: bool, rating: int, feedback: str):
@@ -851,4 +852,5 @@ class EmbedChain(JSONSerializable):
             results = execute_update_usefulness(values)
             return results
         except Exception as e:
+            print(e)
             raise e
