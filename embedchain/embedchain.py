@@ -826,7 +826,7 @@ class EmbedChain(JSONSerializable):
         if not record_id:
             raise RuntimeError("Record id is required while updating chat history.")
 
-        if type(was_helpful) != bool or type(was_helpful) != None:
+        if type(was_helpful) != bool:
             raise RuntimeError("was_usefull should be boolean.")
 
         if type(rating) != int or type(rating) != None:
