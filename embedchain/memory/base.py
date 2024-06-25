@@ -91,9 +91,6 @@ class ChatHistory:
         if not fetch_all:
             params["session_id"] = session_id
         
-        page_number = 1  # replace with your actual page number
-        page_size = page_size  # replace with your actual page size
-        
         offset = (page_number - 1) * page_size
         
         # sql to get chat history
