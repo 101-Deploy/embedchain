@@ -808,7 +808,8 @@ class EmbedChain(JSONSerializable):
         # """
         
         values = {
-            'feedback': feedback
+            'feedback': feedback,
+            'id': record_id
         }
 
         try:
@@ -840,6 +841,7 @@ class EmbedChain(JSONSerializable):
         # WHERE id = '{record_id}';
         # """
         values = {
+            'id': record_id,
             'was_helpful': was_helpful,
             'rating': rating,
             'feedback': feedback
