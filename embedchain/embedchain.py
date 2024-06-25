@@ -813,7 +813,7 @@ class EmbedChain(JSONSerializable):
         except Exception as e:
             raise e
 
-    def update_response_helpfulness(record_id: int, was_helpful: bool, rating: int, feedback: str):
+    def update_response_helpfulness(self, record_id: int, was_helpful: bool, rating: int, feedback: str):
         if not record_id:
             raise RuntimeError("Record id is required while updating chat history.")
 
