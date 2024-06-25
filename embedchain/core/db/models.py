@@ -32,3 +32,5 @@ class ChatHistory(Base):
     was_helful = Column(Boolean)  # Added this column to the table
     rating = Column(Integer)  # Added this column to the table
     feedback = Column(Text)  # Added this column to the table
+    # input_tokens_used = Column(Integer)  # Added this column to the table
+    # output_tokens_used = Column(Integer)  # Added this column to the table

@@ -98,7 +98,7 @@ class ChatHistory:
         
         # sql to get chat history
         sql = f"""
-        SELECT * FROM ec_chat_history WHERE app_id = '{app_id}' ORDER BY created_at ASC LIMIT {page_size} OFFSET {offset};
+        SELECT * FROM ec_chat_history WHERE app_id = '{app_id}' AND session_id = '{session_id}' ORDER BY created_at ASC LIMIT {page_size} OFFSET {offset};
         """
         results = execute_sql(sql)
         # results = results[:num_rounds] if not fetch_all else results
