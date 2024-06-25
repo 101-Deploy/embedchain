@@ -19,7 +19,7 @@ from embedchain.loaders.base_loader import BaseLoader
 from embedchain.models.data_type import DataType, DirectDataType, IndirectDataType, SpecialDataType
 from embedchain.utils.misc import detect_datatype, is_valid_json_string
 from embedchain.vectordb.base import BaseVectorDB
-from embedchain.core.db.database import execute_insert, execute_sql, get_total_interactions
+from embedchain.core.db.database import execute_insert, execute_sql, execute_update_feedback, execute_update_usefulness, get_total_interactions
 
 load_dotenv()
 
@@ -801,14 +801,20 @@ class EmbedChain(JSONSerializable):
         if type(feedback) != str:
             raise RuntimeError("Feedback should be string.")
 
-        sql = f"""
-        UPDATE ec_chat_history
-        SET feedback = '{feedback}'
-        WHERE id = '{record_id}';
-        """
+        # sql = f"""
+        # UPDATE ec_chat_history
+        # SET feedback = '{feedback}'
+        # WHERE id = '{record_id}';
+        # """
+        
+        values = {
+            'feedback': feedback
+        }
 
         try:
-            results = execute_sql(sql)
+            results = execute_update_feedback(
+                values
+            )
             return results
         except Exception as e:
             raise e
@@ -826,16 +832,21 @@ class EmbedChain(JSONSerializable):
         if type(feedback) != str:
             raise RuntimeError("Feedback should be string.")
 
-        sql = f"""
-        UPDATE ec_chat_history
-        SET was_helpful = {was_helpful},
-        rating = {rating},
-        feedback = '{feedback}'
-        WHERE id = '{record_id}';
-        """
+        # sql = f"""
+        # UPDATE ec_chat_history
+        # SET was_helpful = {was_helpful},
+        # rating = {rating},
+        # feedback = '{feedback}'
+        # WHERE id = '{record_id}';
+        # """
+        values = {
+            'was_helpful': was_helpful,
+            'rating': rating,
+            'feedback': feedback
+        }
 
         try:
-            results = execute_sql(sql)
+            results = execute_update_usefulness(values)
             return results
         except Exception as e:
             raise e
