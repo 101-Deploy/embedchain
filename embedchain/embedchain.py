@@ -829,12 +829,6 @@ class EmbedChain(JSONSerializable):
         # if type(was_helpful) != bool:
         #     raise RuntimeError("was_usefull should be boolean.")
 
-        if type(rating) != int or type(rating) != None:
-            raise RuntimeError("Rating should be integer.")
-
-        if type(feedback) != str or type(feedback) != None:
-            raise RuntimeError("Feedback should be string.")
-
         # sql = f"""
         # UPDATE ec_chat_history
         # SET was_helpful = {was_helpful},
@@ -845,8 +839,8 @@ class EmbedChain(JSONSerializable):
         values = {
             'id': record_id if record_id else None,
             'was_helpful': was_helpful if type(was_helpful) == bool else None,
-            'rating': rating if rating else None,
-            'feedback': feedback if feedback else None
+            'rating': rating if type(rating) == int else None,
+            'feedback': feedback if type(feedback) == str else None
         }
         
 
