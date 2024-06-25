@@ -154,30 +154,7 @@ class DatabaseManager:
             return values["id"]
         except Exception as e:
             raise e
-    
-    def execute_update_usefulness(self, values: dict, table: str = "ec_chat_history"):
-        """Executes a raw SQL statement."""
-        try:
-            with self.database.snapshot(multi_use=True) as snapshot:
-                snapshot.execute_sql(
-                    f"UPDATE {table} SET was_helpful = {values['was_helpful']}, rating = {values['rating']}, feedback = '{values['feedback']}' WHERE id = '{values['id']}';"
-                )
-            return values["id"]
-        except Exception as e:
-            print(e)
-            raise e
-    
-    def execute_update_feedback(self, values: dict, table: str = "ec_chat_history"):
-        """Executes a raw SQL statement."""
-        try:
-            with self.database.snapshot(multi_use=True) as snapshot:
-                snapshot.execute_sql(
-                    f"UPDATE {table} SET feedback = '{values['feedback']}' WHERE id = '{values['id']}';"
-                )
-            return values["id"]
-        except Exception as e:
-            print(e)
-            raise e
+
     
     
     def get_total_interactions(self, month: int, year: int):
@@ -260,11 +237,6 @@ def excute_insert(values: dict, table: str):
     return database_manager.execute_insert(table=table, values=values)
 
 
-def execute_update_usefulness(values: dict, table: str = "ec_chat_history"):
-    return database_manager.execute_update_usefulness(values=values, table=table)
-
-def execute_update_feedback(values: dict, table: str = "ec_chat_history"):
-    return database_manager.execute_update_feedback(values=values, table=table)
 
 def execute_transaction(transaction_block):
     database_manager.execute_transaction(transaction_block)
@@ -292,3 +264,29 @@ def execute_insert(values: dict, table: str):
         transaction.execute_update(sql)
 
     get_db().run_in_transaction(insert_data)
+    
+def update_record_feedback(values: dict, table: str):
+    def update_data(transaction):
+        # if feedback is not present in the values or is None, set it to 'NULL'
+
+        sql = f"""
+        UPDATE {table}
+        SET feedback = '{values['feedback']}'
+        WHERE id = '{values['id']}';
+        """
+        transaction.execute_update(sql)
+
+    get_db().run_in_transaction(update_data)
+
+def update_chat_usefulness(values: dict, table: str):
+    def update_data(transaction):
+        # if feedback is not present in the values or is None, set it to 'NULL'
+
+        sql = f"""
+        UPDATE {table}
+        SET was_helpful = {values['was_helpful']}, rating = {values['rating']}, feedback = '{values['feedback']}'
+        WHERE id = '{values['id']}';
+        """
+        transaction.execute_update(sql)
+
+    get_db().run_in_transaction(update_data)

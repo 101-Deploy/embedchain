@@ -19,7 +19,7 @@ from embedchain.loaders.base_loader import BaseLoader
 from embedchain.models.data_type import DataType, DirectDataType, IndirectDataType, SpecialDataType
 from embedchain.utils.misc import detect_datatype, is_valid_json_string
 from embedchain.vectordb.base import BaseVectorDB
-from embedchain.core.db.database import execute_insert, execute_sql, execute_update_feedback, execute_update_usefulness, get_total_interactions
+from embedchain.core.db.database import execute_insert, execute_sql, get_total_interactions, update_chat_usefulness, update_record_feedback
 
 load_dotenv()
 
@@ -813,8 +813,9 @@ class EmbedChain(JSONSerializable):
         }
 
         try:
-            results = execute_update_feedback(
-                values
+            results = update_record_feedback(
+                values=values,
+                table='ec_chat_history' 
             )
             return results
         except Exception as e:
@@ -849,7 +850,10 @@ class EmbedChain(JSONSerializable):
         }
 
         try:
-            results = execute_update_usefulness(values)
+            results = update_chat_usefulness(
+                table='ec_chat_history',
+                values=values
+            )
             return results
         except Exception as e:
             print(e)
