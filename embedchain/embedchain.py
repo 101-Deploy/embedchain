@@ -19,7 +19,7 @@ from embedchain.loaders.base_loader import BaseLoader
 from embedchain.models.data_type import DataType, DirectDataType, IndirectDataType, SpecialDataType
 from embedchain.utils.misc import detect_datatype, is_valid_json_string
 from embedchain.vectordb.base import BaseVectorDB
-from embedchain.core.db.database import execute_insert, execute_sql, get_total_interactions, update_chat_usefulness, update_record_feedback
+from embedchain.core.db.database import execute_insert, execute_sql, get_total_interactions, update_chat_usefulness, update_rating, update_record_feedback
 
 load_dotenv()
 
@@ -843,18 +843,33 @@ class EmbedChain(JSONSerializable):
         # WHERE id = '{record_id}';
         # """
         values = {
-            'id': record_id,
-            'was_helpful': was_helpful,
-            'rating': rating,
-            'feedback': feedback
+            'id': record_id if record_id else None,
+            'was_helpful': was_helpful if was_helpful else None,
+            'rating': rating if rating else None,
+            'feedback': feedback if feedback else None
         }
+        
 
         try:
-            results = update_chat_usefulness(
-                table='ec_chat_history',
-                values=values
-            )
-            return results
+        # iterate over values and and update respective fields
+            for key, value in values.items():
+                if value is not None:
+                    if key == 'id':
+                        continue
+                    if key == 'was_helpful':
+                        update_chat_usefulness(
+                            values=values,
+                        )
+                    if key == 'rating':
+                        update_rating(
+                            values=values,
+                        )
+                    if key == 'feedback':
+                        update_record_feedback(
+                            values=values,
+                        )
+                    
+            return
         except Exception as e:
             print(e)
             raise e

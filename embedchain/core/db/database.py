@@ -265,7 +265,7 @@ def execute_insert(values: dict, table: str):
 
     get_db().run_in_transaction(insert_data)
     
-def update_record_feedback(values: dict, table: str):
+def update_record_feedback(values: dict, table: str = "ec_chat_history"):
     def update_data(transaction):
         # if feedback is not present in the values or is None, set it to 'NULL'
 
@@ -278,13 +278,26 @@ def update_record_feedback(values: dict, table: str):
 
     get_db().run_in_transaction(update_data)
 
-def update_chat_usefulness(values: dict, table: str):
+def update_chat_usefulness(values: dict, table: str = "ec_chat_history"):
     def update_data(transaction):
         # if feedback is not present in the values or is None, set it to 'NULL'
 
         sql = f"""
         UPDATE {table}
-        SET was_helpful = {values['was_helpful']}, rating = {values['rating']}, feedback = '{values['feedback']}'
+        SET was_helpful = {values['was_helpful']}
+        WHERE id = '{values['id']}';
+        """
+        transaction.execute_update(sql)
+
+    get_db().run_in_transaction(update_data)
+
+def update_rating(values: dict, table: str = "ec_chat_history"):
+    def update_data(transaction):
+        # if feedback is not present in the values or is None, set it to 'NULL'
+
+        sql = f"""
+        UPDATE {table}
+        SET rating = {values['rating']}
         WHERE id = '{values['id']}';
         """
         transaction.execute_update(sql)
